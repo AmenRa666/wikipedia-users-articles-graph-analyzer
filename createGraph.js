@@ -11,16 +11,20 @@ const dbAgent = require('./dbAgent.js')
 
 
 // LOGIC
-let articlesList = fs.readFileSync('articlesList.txt', 'utf8').trim().split('\n')
+// let articlesList = fs.readFileSync('articlesList.txt', 'utf8').trim().split('\n')
+
+let articlesList = ['Pericles', 'ciccobbello']
 
 let authorsList = fs.readFileSync('authorsList.txt', 'utf8').trim().split('\n')
 
-// Q
+let edgesList = fs.readFileSync('edgesList.txt', 'utf8').trim().split('\n')
+
+// articles nodes
 let articles = []
-// A
+// author nodes
 let authors = []
-// cij
-let cij = []
+// edges
+let edges = []
 
 // Initialize articles vector
 articlesList.forEach((title) => {
@@ -40,9 +44,24 @@ authorsList.forEach((username) => {
   authors.push(author)
 })
 
+// Initialize edges vector
+edgesList.forEach((_edge) => {
+  let articleAndUser = _edge.split(', ')
+  let edge = {
+    articleTitle: articleAndUser[0],
+    user: articleAndUser[1],
+    numberOfWordsAddedAndSurvived: 0
+  }
+  edges.push(edge)
+})
+
+console.log(edges);
 
 
-// // initialize authors vector
+
+
+
+// initialize authors vector
 // const initializeAuthorVector = (articleTitle) => {
 //   let revisions = []
 //
@@ -68,10 +87,10 @@ authorsList.forEach((username) => {
 //   articlesList,
 //
 // )
-//
-//
-//
-//
+
+
+
+
 // // initialize(articleTitle)
 //
 //
