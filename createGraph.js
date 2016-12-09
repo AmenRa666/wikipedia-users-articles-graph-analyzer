@@ -55,37 +55,49 @@ edgesList.forEach((_edge) => {
   edges.push(edge)
 })
 
-console.log(edges);
 
 
 
 
 
-// initialize authors vector
-// const initializeAuthorVector = (articleTitle) => {
+// initialize edges vector
+// const initializeEdgesVector = (articleTitle, cb) => {
+//   console.log('1');
 //   let revisions = []
 //
 //   dbAgent.findRevisionsByArticleTitle(articleTitle, (_revisions) => {
+//     console.log('2');
 //     revisions = _revisions
-//     for (var i = 0; i < revisions.length; i++) {
-//       if (userList.indexOf(revisions[i].user) == -1) {
-//         userList.push(revisions[i].user)
-//         let user = {
-//           name: revisions[i].user,
-//           autorship: 1
-//         }
-//         users.push(user)
-//       }
-//     }
-//     console.log(articles.length);
-//     console.log(users.length);
-//     process.exit()
+//
+//     revisions.sort((a, b) => {
+//     return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+//     });
+//
+//     console.log(revisions);
+//
+//     // for (var i = 0; i < revisions.length; i++) {
+//     //   if (userList.indexOf(revisions[i].user) == -1) {
+//     //     userList.push(revisions[i].user)
+//     //     let user = {
+//     //       name: revisions[i].user,
+//     //       autorship: 1
+//     //     }
+//     //     users.push(user)
+//     //   }
+//     // }
+//
+//     cb(null, 'Initializa Edges Vector')
 //   })
 // }
 //
-// async.eachSeries = (
-//   articlesList,
 //
+// async.eachSeries(
+//   articlesList,
+//   initializeEdgesVector,
+//   (err, res) => {
+//     console.log(err);
+//     process.exit()
+//   }
 // )
 
 
@@ -128,9 +140,3 @@ console.log(edges);
 //
 // // Number of words added in with the current revision and survived to others
 // let numberOfWordsAddedAndSurvived = _.intersection(addedWords, survivedWords).length
-
-
-
-
-
-process.exit()
