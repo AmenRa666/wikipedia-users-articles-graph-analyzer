@@ -6,7 +6,7 @@ const path = require('path')
 const async = require('async')
 const _ = require('underscore')
 const JsDiff = require('diff')
-var difflib = require('difflib')
+const difflib = require('difflib')
 // Database Agent
 const dbAgent = require('./dbAgent.js')
 
@@ -20,7 +20,7 @@ let currentArticleTitle = null
 
 let articlesList = ['Pericles', 'ciccobbello']
 
-const ceateEdge = (revisionBigram, cb) => {
+const createEdge = (revisionBigram) => {
   time.tic()
   // First revision
   if (revisionBigram.length == 1) {
@@ -50,7 +50,6 @@ const ceateEdge = (revisionBigram, cb) => {
 
     console.log(edges.length);
     time.toc()
-    cb(null, 'Create Edge')
   }
   // All others revisions
   else {
@@ -100,7 +99,6 @@ const ceateEdge = (revisionBigram, cb) => {
     console.log(edges.length);
 
     time.toc()
-    cb(null, 'Create Edge')
   }
 }
 
@@ -130,14 +128,21 @@ const createEdgesList = (articleTitle, cb) => {
       }
     }
 
-    async.eachSeries(
-      revisionBigrams,
-      ceateEdge,
-      (err, res) => {
-        console.log(edges.length);
-        process.exit()
-      }
-    )
+    revisionBigrams.forEach((bigram) => {
+      createEdge(bigram)
+    })
+
+    console.log(edges.length);
+    process.exit()
+
+    // async.eachSeries(
+    //   revisionBigrams,
+    //   ceateEdge,
+    //   (err, res) => {
+    //     console.log(edges.length);
+    //     process.exit()
+    //   }
+    // )
 
 
 
