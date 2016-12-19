@@ -27,22 +27,26 @@ const ceateEdge = (revisionBigram, cb) => {
     let currentRevisionContent = revisionBigram[0].text
     currentRevisionContent = currentRevisionContent.replace(/[,\.:;!?]/g, '').split(' ')
 
-    // let differenceBetweenCurrentAndlastRevisions = JsDiff.diffArrays(currentRevisionContent, lastRevisionContent)
+    let differenceBetweenCurrentAndlastRevisions = difflib.contextDiff(currentRevisionContent, lastRevisionContent, {fromfile:'before', tofile:'after'})
 
-    difflib.contextDiff(currentRevisionContent, lastRevisionContent, {fromfile:'before', tofile:'after'})
+    let survivedWords = []
 
-    // let survivedWords = []
-    // differenceBetweenCurrentAndlastRevisions.forEach((word) => {
-    //   if (word.added != true && word.removed != true) {
-    //     survivedWords = survivedWords.concat(word.value)
-    //   }
-    // })
-    //
-    // edges.push({
-    //   articleTitle: currentArticleTitle,
-    //   user: revisionBigram[0].user,
-    //   numberOfWordsAddedAndSurvived: survivedWords
-    // })
+    differenceBetweenCurrentAndlastRevisions = differenceBetweenCurrentAndlastRevisions.splice(4)
+
+    for (var i = 0; i < differenceBetweenCurrentAndlastRevisions.length; i++) {
+      if (differenceBetweenCurrentAndlastRevisions[i].indexOf('  ') == 0 && differenceBetweenCurrentAndlastRevisions[i].length > 2) {
+        survivedWords.push(differenceBetweenCurrentAndlastRevisions[i].substring(2))
+      }
+      else if (differenceBetweenCurrentAndlastRevisions[i].indexOf('--- ') == 0) {
+        break
+      }
+    }
+
+    edges.push({
+      user: revisionBigram[0].user,
+      articleTitle: currentArticleTitle,
+      numberOfWordsAddedAndSurvived: survivedWords.length
+    })
 
     console.log(edges.length);
     time.toc()
@@ -53,36 +57,45 @@ const ceateEdge = (revisionBigram, cb) => {
     let currentRevisionContent = revisionBigram[1].text
     currentRevisionContent = currentRevisionContent.replace(/[,\.:;!?]/g, '').split(' ')
 
-    // let differenceBetweenCurrentAndlastRevisions = JsDiff.diffArrays(currentRevisionContent, lastRevisionContent)
+    let differenceBetweenCurrentAndlastRevisions = difflib.contextDiff(currentRevisionContent, lastRevisionContent, {fromfile:'before', tofile:'after'})
 
-    difflib.contextDiff(currentRevisionContent, lastRevisionContent, {fromfile:'before', tofile:'after'})
+    let survivedWords = []
 
-    // let survivedWords = []
-    // differenceBetweenCurrentAndlastRevisions.forEach((word) => {
-    //   if (word.added != true && word.removed != true) {
-    //     survivedWords = survivedWords.concat(word.value)
-    //   }
-    // })
+    differenceBetweenCurrentAndlastRevisions = differenceBetweenCurrentAndlastRevisions.splice(4)
+
+    for (var i = 0; i < differenceBetweenCurrentAndlastRevisions.length; i++) {
+      if (differenceBetweenCurrentAndlastRevisions[i].indexOf('  ') == 0 && differenceBetweenCurrentAndlastRevisions[i].length > 2) {
+        survivedWords.push(differenceBetweenCurrentAndlastRevisions[i].substring(2))
+      }
+      else if (differenceBetweenCurrentAndlastRevisions[i].indexOf('--- ') == 0) {
+        break
+      }
+    }
 
     let previousRevisionContent = revisionBigram[0].text
     previousRevisionContent = previousRevisionContent.replace(/[,\.:;!?]/g, '').split(' ')
 
-    // let differenceBetweenPreviousAndCurrentRevisions = JsDiff.diffArrays(previousRevisionContent, currentRevisionContent)
+    let differenceBetweenPreviousAndCurrentRevisions =     difflib.contextDiff(previousRevisionContent, currentRevisionContent, {fromfile:'before', tofile:'after'})
 
-    difflib.contextDiff(previousRevisionContent, currentRevisionContent, {fromfile:'before', tofile:'after'})
+    let addedWords = []
+    let newRevision = false
 
-    // let addedWords = []
-    // differenceBetweenPreviousAndCurrentRevisions.forEach((word) => {
-    //   if (word.added == true) {
-    //     addedWords = addedWords.concat(word.value)
-    //   }
-    // })
-    //
-    // edges.push({
-    //   articleTitle: currentArticleTitle,
-    //   user: revisionBigram[1].user,
-    //   numberOfWordsAddedAndSurvived: _.intersection(addedWords, survivedWords).length
-    // })
+    for (var i = 0; i < differenceBetweenPreviousAndCurrentRevisions.length; i++) {
+      if (newRevision &&
+        (differenceBetweenPreviousAndCurrentRevisions[i].indexOf('+' == 0) || differenceBetweenPreviousAndCurrentRevisions[i].indexOf('!' == 0))
+      ){
+        addedWords.push(differenceBetweenPreviousAndCurrentRevisions[i].substring(2))
+      }
+      else if (differenceBetweenPreviousAndCurrentRevisions[i].indexOf('--- ') == 0) {
+        newRevision = true
+      }
+    }
+
+    edges.push({
+      user: revisionBigram[1].user,
+      articleTitle: currentArticleTitle,
+      numberOfWordsAddedAndSurvived: _.intersection(addedWords, survivedWords).length
+    })
 
     console.log(edges.length);
 
@@ -117,7 +130,7 @@ const createEdgesList = (articleTitle, cb) => {
       }
     }
 
-    async.each(
+    async.eachSeries(
       revisionBigrams,
       ceateEdge,
       (err, res) => {
