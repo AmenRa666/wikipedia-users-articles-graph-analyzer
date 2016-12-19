@@ -46,15 +46,44 @@ authorsList.forEach((username) => {
 
 // Initialize edges vector
 edgesList.forEach((_edge) => {
-  let articleAndUser = _edge.split(', ')
+  let edgeAsArray = _edge.split(', ')
   let edge = {
-    articleTitle: articleAndUser[0],
-    user: articleAndUser[1],
-    numberOfWordsAddedAndSurvived: 0
+    articleTitle: edgeAsArray[0],
+    user: edgeAsArray[1],
+    numberOfWordsAddedAndSurvived: edgeAsArray[2]
   }
   edges.push(edge)
 })
 
+
+
+
+
+const processBasic = () => {
+
+  let _edges = edges.slice(0)
+
+  authors.forEach((author) => {
+    let authorEdges = []
+
+    for (var i = 0; i < _edges.length; i++) {
+      if (_edges[i].user == author.user) {
+        authorEdges.push(_edges[i])
+        i--
+        array.splice(i, 1)
+      }
+    }
+
+    edges.forEach((edge) => {
+      if (edge.user == author.user) {
+
+      }
+    })
+
+  })
+
+
+}
 
 
 
