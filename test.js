@@ -103,6 +103,7 @@ const createEdge = (revisionBigram) => {
 }
 
 const createEdgesList = (articleTitle, cb) => {
+  time.tic()
   edges = []
   lastRevisionContent = null
   currentArticleTitle = articleTitle
@@ -132,21 +133,31 @@ const createEdgesList = (articleTitle, cb) => {
       createEdge(bigram)
     })
 
-    console.log(edges.length);
-    process.exit()
+    let _edges = []
 
-    // async.eachSeries(
-    //   revisionBigrams,
-    //   ceateEdge,
-    //   (err, res) => {
-    //     console.log(edges.length);
-    //     process.exit()
-    //   }
-    // )
+    for (var i = 0; i < edges.length; i++) {
+      let numberOfWordsAddedAndSurvived = edges[i].numberOfWordsAddedAndSurvived
 
+      let notPresent = true
 
+      for (var k = 0; k < _edges.length; k++) {
+        if(_edges[k].user == edges[i].user){
+          notPresent = false
+          break
+        }
+      }
 
-
+      if(notPresent) {
+        for (var j = 0; j < edges.length; j++) {
+          if ((edges[j].revid != edges[i].revid) && (edges[j].user == edges[i].user)) {
+            numberOfWordsAddedAndSurvived = numberOfWordsAddedAndSurvived + edges[j].numberOfWordsAddedAndSurvived
+          }
+        }
+        let edge = edges[i].articleTitle + ', ' + edges[i].user.replace(/ /g, '_') + ', ' + numberOfWordsAddedAndSurvived
+        _edges.push(edges[i])
+        fs.appendFileSync('edgesList.txt', edge + '\n')
+      }
+    }
 
 
 
@@ -157,7 +168,11 @@ const createEdgesList = (articleTitle, cb) => {
     //     fs.appendFileSync('edgesList.txt', edge + '\n')
     //   }
     // })
-    // cb(null, 'Create Edges List')
+
+
+    time.toc()
+    process.exit()
+    cb(null, 'Create Edges List')
   })
 }
 
